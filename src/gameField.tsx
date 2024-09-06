@@ -7,8 +7,8 @@ const GameField: FC = () => {
 
     const y1Ref = useRef(250);
     const y2Ref = useRef(270);
-    const dy1Ref = useRef(2);
-    const dy2Ref = useRef(-2);
+    const dy1Ref = useRef<number>(2);
+    const dy2Ref = useRef<number>(-2);
 
 
     const [points1, setPoints1] = useState(0);
@@ -19,7 +19,9 @@ const GameField: FC = () => {
     const [spellColor2, setSpellColor2] = useState("black");
     const [selectedPlayer, setSelectedPlayer] = useState<number | null>(null);
 
-    const bulletSpeed = 3;
+    const bulletSpeedRef = useRef<number>(3);
+    const playerSpeedRef = useRef<number>(2);
+
 
     let bullets: { x: number, y: number, direction: 'left' | 'right' }[] = [];
 
@@ -93,7 +95,7 @@ const GameField: FC = () => {
             if (context) {
                 bullets = bullets.map(bullet => ({
                     ...bullet,
-                    x: bullet.direction === 'left' ? bullet.x - bulletSpeed : bullet.x + bulletSpeed
+                    x: bullet.direction === 'left' ? bullet.x - bulletSpeedRef.current : bullet.x + bulletSpeedRef.current
                 })).filter(bullet => bullet.x > 0 && bullet.x < canvas.width);
             }
         }
@@ -105,14 +107,14 @@ const GameField: FC = () => {
             const context = canvas.getContext('2d');
             if (context) {
                 if (y1Ref.current + 35 > context.canvas.height || y1Ref.current - 35 < 0) {
-                    dy1Ref.current = -dy1Ref.current;
+                    dy1Ref.current = -dy1Ref.current
                 }
                 if (y2Ref.current + 35 > context.canvas.height || y2Ref.current - 35 < 0) {
-                    dy2Ref.current = -dy2Ref.current;
+                    dy2Ref.current = -dy2Ref.current
                 }
 
-                y1Ref.current += dy1Ref.current;
-                y2Ref.current += dy2Ref.current;
+                y1Ref.current += dy1Ref.current * playerSpeedRef.current
+                y2Ref.current += dy2Ref.current * playerSpeedRef.current
 
                 updateBulletPos()
                 makePlayers(context);
@@ -195,7 +197,6 @@ const GameField: FC = () => {
         } else if (selectedPlayer === 2) {
             setSpellColor2(color);
         }
-        setSelectedPlayer(null);
     };
 
     const handlePlayerSelect = (event: MouseEvent) => {
@@ -213,6 +214,12 @@ const GameField: FC = () => {
                 setSelectedPlayer(null);
             }
         }
+    };
+
+
+    const applySettings = (playerSpeed: number, bulletSpeed: number) => {
+        playerSpeedRef.current = playerSpeed;
+        bulletSpeedRef.current = bulletSpeed;
     };
 
 
@@ -238,7 +245,8 @@ const GameField: FC = () => {
             <MenuSettings
                 selectedPlayer={selectedPlayer}
                 changeSpellColor={changeSpellColor} play={play}
-
+                onClose={() => setSelectedPlayer(null)}
+                onApplySettings={applySettings}
             />
 
         </div>

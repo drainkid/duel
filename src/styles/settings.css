@@ -66,15 +66,9 @@
     border-left-color: #000000;
 }
 
-/* player.css */
-.player {
-    position: absolute;
-    border-radius: 50%;
-    cursor: pointer;
-}
 
-/* spellmenu.css */
 .spell-menu {
+    position: absolute;
     display: flex;
     flex-direction: column;
     background: white;
